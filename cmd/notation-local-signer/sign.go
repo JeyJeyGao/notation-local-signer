@@ -3,7 +3,6 @@ package main
 import (
 	"crypto"
 	"crypto/rand"
-	"encoding/base64"
 	"encoding/json"
 	"errors"
 	"fmt"
@@ -12,6 +11,7 @@ import (
 	"github.com/notaryproject/notation-core-go/signature"
 	"github.com/notaryproject/notation-core-go/x509"
 	"github.com/notaryproject/notation-go/plugin/proto"
+	"github.com/secure-systems-lab/go-securesystemslib/encrypted"
 	"github.com/spf13/cobra"
 	"github.com/veraison/go-cose"
 )
@@ -70,14 +70,31 @@ func sign(req *proto.GenerateSignatureRequest) (*proto.GenerateSignatureResponse
 			Err:  errors.New("no private key specified"),
 		}
 	}
-	data, err := base64.StdEncoding.DecodeString(os.Getenv(env))
+	encryptedKey := os.Getenv(env)
+	if encryptedKey == "" {
+		return nil, proto.RequestError{
+			Code: proto.ErrorCodeValidation,
+			Err:  fmt.Errorf("environment variable %q not set", env),
+		}
+	}
+
+	password := req.PluginConfig["password"]
+	if password == "" {
+		return nil, proto.RequestError{
+			Code: proto.ErrorCodeValidation,
+			Err:  errors.New("no password specified"),
+		}
+	}
+
+	keyValue, err := encrypted.Decrypt([]byte(encryptedKey), []byte(password))
 	if err != nil {
 		return nil, proto.RequestError{
 			Code: proto.ErrorCodeValidation,
-			Err:  fmt.Errorf("failed to decode private key from environment variable %q: %w", env, err),
+			Err:  fmt.Errorf("failed to decrypt private key from environment variable %q: %w", env, err),
 		}
 	}
-	key, err := x509.ParsePrivateKeyPEM(data)
+
+	key, err := x509.ParsePrivateKeyPEM(keyValue)
 	if err != nil {
 		return nil, proto.RequestError{
 			Code: proto.ErrorCodeValidation,
