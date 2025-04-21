@@ -34,7 +34,7 @@ signs:
       - "blob"
       - "sign"
       - "--plugin=local-signer"
-      - "--id=localsigner
+      - "--id=localsigner"
       - "--plugin-config=certificate_bundle_path=./notation.crt"
       - "--signature-format=cose"
       - "--signature-directory=./dist"
