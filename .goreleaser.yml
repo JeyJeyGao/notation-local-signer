@@ -41,6 +41,3 @@ signs:
       - "--signature-directory=./dist"
       - "${artifact}"
     artifacts: all
-    env:
-      - LOCAL_SIGNER_SIGNING_KEY={{ .Env.LOCAL_SIGNER_SIGNING_KEY }}
-      - LOCAL_SIGNER_SIGNING_KEY_PASSWORD={{ .Env.LOCAL_SIGNER_SIGNING_KEY_PASSWORD }}
