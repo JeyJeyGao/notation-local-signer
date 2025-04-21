@@ -21,7 +21,8 @@ jobs:
       - name: setup Notation CLI
         uses: notaryproject/notation-action/setup@v1
         with:
-          versin: v1.3.1
+          url: https://github.com/notaryproject/notation/releases/download/v2.0.0-alpha.1/notation_2.0.0-alpha.1_linux_amd64.tar.gz
+          checksum: 797b14dcb5d09a8cb05e8e9d6848b2e9c722dc8af01f8f0f6ddf50337caafe24
       - name: Install Notatio AKV plugin
         run: |
           notation plugin install \
