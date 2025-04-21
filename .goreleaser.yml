@@ -27,3 +27,19 @@ archives:
 release:
   prerelease: auto
   draft: true
+signs:
+  - cmd: notation
+    signature: "${artifact}.cose.sig"
+    args:
+      - "blob"
+      - "sign"
+      - "--plugin=local-signer"
+      - "--id=localsigner
+      - "--plugin-config=certificate_bundle_path=./notation.crt"
+      - "--signature-format=cose"
+      - "--signature-directory=./dist"
+      - "${artifact}"
+    artifacts: all
+    env:
+      - LOCAL_SIGNER_SIGNING_KEY: "{{ .Env.LOCAL_SIGNER_SIGNING_KEY }}"
+      - LOCAL_SIGNER_SIGNING_KEY_PASSWORD: "{{ .Env.LOCAL_SIGNER_SIGNING_KEY_PASSWORD }}"
