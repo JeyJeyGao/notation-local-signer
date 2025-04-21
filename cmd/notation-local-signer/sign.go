@@ -47,8 +47,16 @@ func runSign() error {
 }
 
 func sign(req *proto.GenerateSignatureRequest) (*proto.GenerateSignatureResponse, error) {
+	certBundle, ok := req.PluginConfig["certificate_bundle_path"]
+	if !ok {
+		return nil, proto.RequestError{
+			Code: proto.ErrorCodeValidation,
+			Err:  errors.New("no certificate bundle path found"),
+		}
+	}
+
 	// read certificate
-	certs, err := x509.ReadCertificateFile(req.KeyID)
+	certs, err := x509.ReadCertificateFile(certBundle)
 	if err != nil {
 		return nil, proto.RequestError{
 			Code: proto.ErrorCodeValidation,

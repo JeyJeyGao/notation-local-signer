@@ -32,8 +32,16 @@ func runDescribeKey() error {
 		}
 	}
 
+	certBundle, ok := req.PluginConfig["certificate_bundle_path"]
+	if !ok {
+		return proto.RequestError{
+			Code: proto.ErrorCodeValidation,
+			Err:  errors.New("no certificate bundle path found"),
+		}
+	}
+
 	// describe key
-	certs, err := x509.ReadCertificateFile(req.KeyID)
+	certs, err := x509.ReadCertificateFile(certBundle)
 	if err != nil {
 		return proto.RequestError{
 			Code: proto.ErrorCodeValidation,
