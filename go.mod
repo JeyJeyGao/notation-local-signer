@@ -8,6 +8,7 @@ require (
 	github.com/secure-systems-lab/go-securesystemslib v0.9.0
 	github.com/spf13/cobra v1.7.0
 	github.com/veraison/go-cose v1.0.0
+	golang.org/x/term v0.27.0
 )
 
 require (

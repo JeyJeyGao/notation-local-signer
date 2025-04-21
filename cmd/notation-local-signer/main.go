@@ -25,6 +25,7 @@ func main() {
 		getMetadataCommand(),
 		describeKeyCommand(),
 		signCommand(),
+		encryptCommand(),
 	)
 	if err := cmd.ExecuteContext(ctx); err != nil {
 		var rerr proto.RequestError

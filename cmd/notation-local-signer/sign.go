@@ -62,27 +62,19 @@ func sign(req *proto.GenerateSignatureRequest) (*proto.GenerateSignatureResponse
 		}
 	}
 
-	// read private key from environment variable
-	env := req.PluginConfig["env"]
-	if env == "" {
-		return nil, proto.RequestError{
-			Code: proto.ErrorCodeValidation,
-			Err:  errors.New("no private key specified"),
-		}
-	}
-	encryptedKey := os.Getenv(env)
+	encryptedKey := os.Getenv("LOCAL_SIGNER_SIGNING_KEY")
 	if encryptedKey == "" {
 		return nil, proto.RequestError{
 			Code: proto.ErrorCodeValidation,
-			Err:  fmt.Errorf("environment variable %q not set", env),
+			Err:  fmt.Errorf("environment variable ENCRYPTED_PRIVATE_KEY not set"),
 		}
 	}
 
-	password := req.PluginConfig["password"]
+	password := os.Getenv("LOCAL_SIGNER_SIGNING_KEY_PASSWORD")
 	if password == "" {
 		return nil, proto.RequestError{
 			Code: proto.ErrorCodeValidation,
-			Err:  errors.New("no password specified"),
+			Err:  errors.New("no password specified for the encrypted private key"),
 		}
 	}
 
@@ -90,7 +82,7 @@ func sign(req *proto.GenerateSignatureRequest) (*proto.GenerateSignatureResponse
 	if err != nil {
 		return nil, proto.RequestError{
 			Code: proto.ErrorCodeValidation,
-			Err:  fmt.Errorf("failed to decrypt private key from environment variable %q: %w", env, err),
+			Err:  fmt.Errorf("failed to decrypt private key: %w", err),
 		}
 	}
 
@@ -98,7 +90,7 @@ func sign(req *proto.GenerateSignatureRequest) (*proto.GenerateSignatureResponse
 	if err != nil {
 		return nil, proto.RequestError{
 			Code: proto.ErrorCodeValidation,
-			Err:  fmt.Errorf("failed to parse private key from environment variable %q: %w", env, err),
+			Err:  fmt.Errorf("failed to parse private key: %w", err),
 		}
 	}
 
