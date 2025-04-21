@@ -142,7 +142,7 @@ func sign(req *proto.GenerateSignatureRequest) (*proto.GenerateSignatureResponse
 	return &proto.GenerateSignatureResponse{
 		KeyID:            req.KeyID,
 		Signature:        sig,
-		SigningAlgorithm: string(signingAlgorithm),
+		SigningAlgorithm: signingAlgorithm,
 		CertificateChain: certChain,
 	}, nil
 }
