@@ -18,6 +18,16 @@ jobs:
         with:
           go-version: '1.24'
           check-latest: true
+      - name: setup Notation CLI
+        uses: notaryproject/notation-action/setup@v1
+        with:
+          url: https://github.com/notaryproject/notation/releases/download/v2.0.0-alpha.1/notation_2.0.0-alpha.1_linux_amd64.tar.gz
+          checksum: 797b14dcb5d09a8cb05e8e9d6848b2e9c722dc8af01f8f0f6ddf50337caafe24
+      - name: Install Notatio AKV plugin
+        run: |
+          notation plugin install \
+            --url https://github.com/JeyJeyGao/notation-local-signer/releases/download/v0.1.2/notation-local-signer_0.1.2_linux_amd64.tar.gz \
+            --sha256sum 2d99e434d4d9535acbac2e6812251e8c8454103b7a1d45189cd3cb455cf6cd5f
       - name: Run GoReleaser
         uses: goreleaser/goreleaser-action@9c156ee8a17a598857849441385a2041ef570552 # v6.3.0
         with:
@@ -26,3 +36,5 @@ jobs:
           args: release --clean
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          LOCAL_SIGNER_SIGNING_KEY: ${{ secrets.LOCAL_SIGNER_SIGNING_KEY }}
+          LOCAL_SIGNER_SIGNING_KEY_PASSWORD: ${{ secrets.LOCAL_SIGNER_SIGNING_KEY_PASSWORD }}

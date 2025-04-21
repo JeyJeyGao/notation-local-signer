@@ -1,4 +1,5 @@
 # Check the documentation at https://goreleaser.com for more options
+version: 2
 builds:
   - id: notation-local-signer
     main: ./cmd/notation-local-signer
@@ -27,3 +28,16 @@ archives:
 release:
   prerelease: auto
   draft: true
+signs:
+  - cmd: notation
+    signature: "${artifact}.cose.sig"
+    args:
+      - "blob"
+      - "sign"
+      - "--plugin=local-signer"
+      - "--id=localsigner"
+      - "--plugin-config=certificate_bundle_path=./notation.crt"
+      - "--signature-format=cose"
+      - "--signature-directory=./dist"
+      - "${artifact}"
+    artifacts: all
