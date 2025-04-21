@@ -38,7 +38,7 @@ The signature publisher should prepare the certificate download URL, certificate
 
 To get the certificate SHA256 fingerprint, please run:
 ```bash
-shasum -a 256 notation.crt | cut -d ' ' -f1
+openssl x509 -in notation.crt -fingerprint -sha256 -noout | awk -F'sha256 Fingerprint=' '{print $2}'
 ```
 
 To get the signing certificate's trusted identity, please run:
@@ -53,8 +53,8 @@ SIGNATURE=<signature-path>
 TARGET_FILE=<signed-target-file-path>
 
 notation blob quick-verify \
-  --certificate-url "https://raw.githubusercontent.com/JeyJeyGao/notation-local-signer/refs/tags/v1/notation.crt" \
-  --sha256sum "b3f47ce158f3caf4af84f016d41daeed9820494a6ff86b9e07ba471fc8fd977e" \
+  --certificate-url "https://raw.githubusercontent.com/JeyJeyGao/notation-local-signer/refs/tags/v0.1.0/notation.crt" \
+  --certificate-sha256-fingerprint "F3:5E:B5:3F:6A:BF:55:89:BA:51:EB:39:7B:1A:BA:3A:0A:30:77:14:2C:12:BD:86:EF:5F:CD:54:C5:BE:8B:C4" \
   --trusted-identity "x509.subject: C = US, ST = Redmond, L = Redmond, O = notation, CN = notation-local-signer" \
   --signature $SIGNATURE \
   $TARGET_FILE
