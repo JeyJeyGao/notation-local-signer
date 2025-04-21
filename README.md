@@ -1,7 +1,7 @@
-# Notation release signing example
+# Notation Release Signing Example
 
-## Generate signing key
-1. Use OpenSSL to generate a signing key with certificate
+## Generate Signing Key
+1. Use OpenSSL to generate a signing key with certificate:
 ```sh
 keyname=notation
 subject="/C=US/ST=Redmond/L=Redmond/O=notation/CN=notation-local-signer"
@@ -15,43 +15,46 @@ openssl req  \
     -days 365
 ```
 
-2. Use notation local-signer plugin to encrypt the key. Follow the prompt to enter the password
-```
-notation-local-signer encrypt "./notationkey"
+2. Use notation local-signer plugin to encrypt the key. Follow the prompt to enter the password:
+```sh
+notation-local-signer encrypt "${keyname}.key"
 ```
 
-Then you can remove your $keynane.key to avoid the key leak.
+After encryption, you should delete the unencrypted `${keyname}.key` file to prevent accidental key exposure.
 
-## Set up release signing for Github
-1. add your notationcrt file to your code repository, which will be used for the verifier to download
-2. add a Github workflow secret to store the content of notationkey.enc file and export the value to env `LOCAL_SIGNER_SIGNING_KEY`
-3. add a Github workflow secret to store your password and export the value to env `LOCAL_SIGNER_SIGNING_KEY_PASSWORD`
-3. setup release signing workflow with notation
-```
+## Set Up Release Signing for GitHub
+1. Add your certificate file (notation.crt) to your code repository, which will be used by verifiers to download.
+2. Add a GitHub workflow secret to store the content of the encrypted key file (notation.key.enc) and export the value to the environment variable `LOCAL_SIGNER_SIGNING_KEY`.
+3. Add a GitHub workflow secret to store your password and export the value to the environment variable `LOCAL_SIGNER_SIGNING_KEY_PASSWORD`.
+4. Set up a release signing workflow with notation:
+```sh
 notation blob sign --id local-signer --plugin local-signer \
   --plugin-config certificate_bundle_path='./notation.crt'
 ```
 
 
 ## Verification
-The Signature publisher should prepare the certificate downloading URL, certificate sha256 fingerprint, and the trusted identity and publish it on the trusted source to the downloader to verify your released assets with signature.
+The signature publisher should prepare the certificate download URL, certificate SHA256 fingerprint, and the trusted identity and publish this information on a trusted source for downloaders to verify released assets with signatures.
 
-To get the certificate sha256 fingerprint, please run:
-```
+To get the certificate SHA256 fingerprint, please run:
+```bash
 shasum -a 256 notation.crt | cut -d ' ' -f1
 ```
-To get signing certificate trusted identity, please run:
-```
+
+To get the signing certificate's trusted identity, please run:
+```bash
 echo "x509.subject: $(openssl x509 -in notation.crt -subject -noout | awk -F'subject=' '{print $2}')"
 ```
 
-```sh
-# verifier need type in the fields
+For verifiers to validate a signature, they should use:
+```bash
+# Replace these variables with actual values
 SIGNATURE=<signature-path>
 TARGET_FILE=<signed-target-file-path>
 
 notation blob quick-verify \
   --certificate-url "https://raw.githubusercontent.com/JeyJeyGao/notation-local-signer/refs/tags/v1/notation.crt" \
+  --sha256sum "b3f47ce158f3caf4af84f016d41daeed9820494a6ff86b9e07ba471fc8fd977e" \
   --trusted-identity "x509.subject: C = US, ST = Redmond, L = Redmond, O = notation, CN = notation-local-signer" \
   --signature $SIGNATURE \
   $TARGET_FILE
